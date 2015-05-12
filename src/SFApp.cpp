@@ -6,7 +6,7 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
 
   app_box = make_shared<SFBoundingBox>(Vector2(canvas_w, canvas_h), canvas_w, canvas_h);
   player  = make_shared<SFAsset>(SFASSET_PLAYER, sf_window);
-  auto player_pos = Point2(canvas_w, 88.0f);
+  auto player_pos = Point2(canvas_w/2, 22);
   player->SetPosition(player_pos);
 
   const int number_of_aliens = 10;
@@ -17,7 +17,14 @@ SFApp::SFApp(std::shared_ptr<SFWindow> window) : fire(0), is_running(true), sf_w
     alien->SetPosition(pos);
     aliens.push_back(alien);
   }
-
+ 
+  for(int i=0; i<5; i++) {
+    // place an alien at width/number_of_aliens * i
+    auto block = make_shared<SFAsset>(SFASSET_BLOCK, sf_window);
+    auto pos   = Point2(100 * i, 200.0f);
+    block->SetPosition(pos);
+    BLOCK.push_back(block);
+  }
   auto coin = make_shared<SFAsset>(SFASSET_COIN, sf_window);
   auto pos  = Point2((canvas_w/4), 100);
   coin->SetPosition(pos);
@@ -47,6 +54,12 @@ void SFApp::OnEvent(SFEvent& event) {
   case SFEVENT_PLAYER_RIGHT:
     player->GoEast();
     break;
+  case SFEVENT_PLAYER_UP:
+    player->GoNorth();
+    break;
+  case SFEVENT_PLAYER_DOWN:
+    player->GoSouth();
+    break;
   case SFEVENT_FIRE:
     fire ++;
     FireProjectile();
@@ -58,9 +71,9 @@ int SFApp::OnExecute() {
   // Execute the app
   SDL_Event event;
   while (SDL_WaitEvent(&event) && is_running) {
-    // if this is an update event, then handle it in SFApp,
-    // otherwise punt it to the SFEventDispacher.
+    // wrap an SDL_Event with our SFEvent
     SFEvent sfevent((const SDL_Event) event);
+    // handle our SFEvent
     OnEvent(sfevent);
   }
 }
@@ -72,13 +85,14 @@ void SFApp::OnUpdateWorld() {
   }
 
   for(auto c: coins) {
-    c->GoNorth();
+    c->Vibrate();
   }
 
   // Update enemy positions
-  for(auto a : aliens) {
+  for(auto a : aliens) 
+    
     // do something here
-  }
+  
 
   // Detect collisions
   for(auto p : projectiles) {
@@ -103,7 +117,9 @@ void SFApp::OnUpdateWorld() {
 
 void SFApp::OnRender() {
   SDL_RenderClear(sf_window->getRenderer());
-
+for( auto b:BLOCK){
+if(b->IsAlive()) {b->OnRender();}
+}
   // draw the player
   player->OnRender();
 
@@ -116,7 +132,7 @@ void SFApp::OnRender() {
   }
 
   for(auto c: coins) {
-    c->OnRender();
+    c->OnRender(); 
   }
 
   // Switch the off-screen buffer to be on-screen

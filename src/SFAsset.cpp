@@ -18,6 +18,8 @@ SFAsset::SFAsset(SFASSETTYPE type, std::shared_ptr<SFWindow> window): type(type)
   case SFASSET_COIN:
     sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/coin.png");
     break;
+ case SFASSET_BLOCK:
+    sprite = IMG_LoadTexture(sf_window->getRenderer(), "assets/BLOCK.png");
   }
 
   if(!sprite) {
@@ -70,6 +72,9 @@ void SFAsset::SetPosition(Point2 & point) {
   bbox->SetCentre(v);
 }
 
+void SFAsset::Vibrate(){
+}
+
 Point2 SFAsset::GetPosition() {
   return Point2(bbox->centre->getX(), bbox->centre->getY());
 }
@@ -82,7 +87,7 @@ void SFAsset::OnRender() {
   // 1. Get the SDL_Rect from SFBoundingBox
   SDL_Rect rect;
 
-  Vector2 gs = (*(bbox->centre) + (*(bbox->extent_x) * -1)) + (*(bbox->extent_y) * -1);
+  Vector2 gs = (*(bbox->centre) + (*(bbox->extent_x) * -1)) + (*(bbox->extent_y) * 1);
   Vector2 ss = GameSpaceToScreenSpace(sf_window->getRenderer(), gs);
   rect.x = ss.getX();
   rect.y = ss.getY();
@@ -113,7 +118,13 @@ void SFAsset::GoEast() {
 }
 
 void SFAsset::GoNorth() {
-  Vector2 c = *(bbox->centre) + Vector2(0.0f, 1.0f);
+  Vector2 c = *(bbox->centre) + Vector2(0.0f, 5.0f);
+  bbox->centre.reset();
+  bbox->centre = make_shared<Vector2>(c);
+}
+//
+void SFAsset::GoSouth() {
+  Vector2 c = *(bbox->centre) + Vector2(0.0f, -5.0f);
   bbox->centre.reset();
   bbox->centre = make_shared<Vector2>(c);
 }

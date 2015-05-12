@@ -28,7 +28,6 @@ public:
 
   void    FireProjectile();
 private:
-  SDL_Surface           * surface;
   bool                    is_running;
 
   shared_ptr<SFWindow>       sf_window;
@@ -38,9 +37,8 @@ private:
   list<shared_ptr<SFAsset> > projectiles;
   list<shared_ptr<SFAsset> > aliens;
   list<shared_ptr<SFAsset> > coins;
+  list<shared_ptr<SFAsset> > BLOCK;
 
   int fire;
-
-  SFError OnInit();
 };
 #endif
